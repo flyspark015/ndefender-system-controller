@@ -1,11 +1,11 @@
 ✅ Completed
 - [x] Step 0: Roadmap + API/models + GREEN checklist
+- [x] Step 1: Skeleton app + CI + minimal endpoints
 
 🟡 In Progress
-- [ ] Step 1: Skeleton app + CI + minimal endpoints
+- [ ] Step 2: Supervisor state store + scheduler + WS fan-out
 
 ❌ Pending
-- [ ] Step 2: Supervisor state store + scheduler + WS fan-out
 - [ ] Step 3: System stats module + /api/v1/system
 - [ ] Step 4: UPS HAT (E) module + keepalive + /api/v1/ups
 - [ ] Step 5: Systemd service manager + restart guard + /api/v1/services

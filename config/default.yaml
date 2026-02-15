@@ -1,0 +1,17 @@
+app:
+  name: ndefender-system-controller
+  version: 0.1.0
+  api_key: ""
+  allow_unsafe: false
+
+scheduler:
+  system_interval_s: 2
+  ups_interval_s: 2
+  services_interval_s: 5
+  network_interval_s: 5
+  audio_interval_s: 5
+
+ups:
+  i2c_bus: 1
+  i2c_addr: 0x2d
+  keepalive_interval_s: 5
