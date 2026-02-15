@@ -7,10 +7,18 @@
 - [x] Step 5: Systemd service manager + restart guard + /api/v1/services
 - [x] Step 6: Network manager + /api/v1/network
 - [x] Step 7: Audio manager + /api/v1/audio
+- [x] Step 8: Power controls (guarded reboot/shutdown)
 
 🟡 In Progress
-- [ ] Step 8: Power controls (guarded reboot/shutdown)
+- [ ] Step 9: Docs hardening + deployment + dev tools
 
 ❌ Pending
-- [ ] Step 9: Docs hardening + deployment + dev tools
 - [ ] Step 10: Release lock + v1.0.0 tag
+
+## Verification Log ✅
+- Command: `ruff check .`
+  - Output: `All checks passed!`
+  - Status: ✅
+- Command: `pytest`
+  - Output: `15 passed in 1.23s` (sample)
+  - Status: ✅

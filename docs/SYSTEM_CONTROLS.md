@@ -6,5 +6,14 @@ The system stats endpoint is live:
 
 Fields include CPU temp, uptime, load averages, RAM/disk usage, and throttling flags when available.
 
-## Power Controls
-Reboot/shutdown safety controls will be implemented in Step 8.
+## Power Controls 🔒
+Guarded power endpoints:
+- `POST /api/v1/system/reboot`
+- `POST /api/v1/system/shutdown`
+
+Requirements:
+- Body: `{ "confirm": true }`
+- Cooldown: 30s
+- Unsafe actions are blocked unless `NDEFENDER_ALLOW_UNSAFE=true`
+
+Responses use COMMAND_ACK-like envelopes.

@@ -9,4 +9,6 @@ This document will expand in later steps. Current endpoints:
 - `POST /api/v1/services/{name}/restart`
 - `GET /api/v1/network`
 - `GET /api/v1/audio`
+- `POST /api/v1/system/reboot`
+- `POST /api/v1/system/shutdown`
 - `WS /api/v1/ws`

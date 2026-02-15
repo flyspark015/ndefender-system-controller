@@ -54,3 +54,18 @@ def test_audio_endpoint():
     assert resp.status_code == 200
     data = resp.json()
     assert "muted" in data
+
+
+def test_reboot_requires_confirm():
+    resp = client.post("/api/v1/system/reboot", json={})
+    assert resp.status_code == 400
+
+
+def test_shutdown_requires_confirm():
+    resp = client.post("/api/v1/system/shutdown", json={})
+    assert resp.status_code == 400
+
+
+def test_reboot_blocked_when_unsafe_disabled():
+    resp = client.post("/api/v1/system/reboot", json={"confirm": True})
+    assert resp.status_code == 403
