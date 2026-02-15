@@ -1,7 +1,31 @@
 # Deployment 🚀
 
-## Systemd Unit (Sample)
-Path: `docs/systemd/ndefender-system-controller.service`
+## Overview
+This document describes production deployment using systemd.
+
+## Architecture
+- Service runs as a simple systemd unit
+- Uvicorn hosts the FastAPI app on port 8000
+
+## API Examples
+Health check after deploy:
+```bash
+curl -s http://127.0.0.1:8000/api/v1/health
+```
+
+## Failure Modes
+- Missing venv or deps will prevent service start.
+- Wrong WorkingDirectory will fail import resolution.
+
+## Safety Notes
+- Keep `NDEFENDER_ALLOW_UNSAFE=false` unless required.
+
+## Troubleshooting
+- `systemctl status ndefender-system-controller`
+- `journalctl -u ndefender-system-controller -f`
+
+## Configuration
+Sample unit: `docs/systemd/ndefender-system-controller.service`
 
 ```
 [Unit]
@@ -21,13 +45,17 @@ Environment=NDEFENDER_ALLOW_UNSAFE=false
 WantedBy=multi-user.target
 ```
 
-## Install Steps
+Install steps:
 1. Copy repo to `/opt/ndefender-system-controller`
 2. Create venv: `python3 -m venv .venv`
 3. Install deps: `. .venv/bin/activate && pip install -e .[dev]`
-4. Copy the unit file to `/etc/systemd/system/ndefender-system-controller.service`
+4. Copy unit to `/etc/systemd/system/ndefender-system-controller.service`
 5. Reload: `sudo systemctl daemon-reload`
 6. Enable: `sudo systemctl enable --now ndefender-system-controller`
 
-## Logs
-- `journalctl -u ndefender-system-controller -f`
+## Performance Notes
+- Use `uvicorn` with `--workers 1` on Pi for consistent CPU usage.
+
+## Security Notes
+- Use API key on untrusted networks.
+- Restrict firewall to LAN if possible.

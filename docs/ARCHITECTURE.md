@@ -1,34 +1,49 @@
 # Architecture 🧱
 
 ## Overview
-The system controller is a FastAPI service that maintains a central in-memory state and publishes updates over REST and WebSocket. It is designed for Raspberry Pi 5 with UPS HAT (E) I2C telemetry.
+The system controller is a FastAPI service with background pollers feeding a central in‑memory snapshot. REST endpoints read from this snapshot; WebSocket broadcasts publish incremental updates.
 
-## Core Components
-- `Supervisor` orchestrates polling, state storage, and WS broadcasts.
-- `SystemStatsCollector` gathers CPU/RAM/Disk/Temp/Uptime/Throttling.
-- `UpsHatE` reads UPS registers and normalizes telemetry.
-- `SystemdManager` queries service status and performs guarded restarts.
-- `NetworkManager` reads SSID and IP addresses.
-- `AudioManager` reads volume and mute state via ALSA.
-- `PowerController` performs guarded reboot/shutdown when enabled.
+## Architecture
+```
++-----------------------------+
+|         FastAPI App         |
+|  REST + WebSocket /api/v1   |
++--------------+--------------+
+               |
+               v
++-----------------------------+
+|         Supervisor          |
+|  Pollers + State Snapshot   |
++----+----+----+----+----+-----+
+     |    |    |    |    |
+     v    v    v    v    v
+  System  UPS Services Network Audio
+  Stats   HAT  systemd   WiFi   ALSA
+```
 
-## Data Flow
-1. Supervisor runs polling loops on configurable intervals.
-2. Each poll updates the in-memory snapshot.
-3. WS broadcasts publish deltas using the standard envelope.
-4. REST endpoints read the latest snapshot.
+## API Examples
+- REST reads: `/api/v1/status`
+- WS: `/api/v1/ws`
 
-## Fault Handling
-- Poller exceptions are caught and logged; the service continues.
-- UPS and system stats return empty/partial models if read fails.
-- Risky operations are blocked by default unless explicitly enabled.
+## Failure Modes
+- Individual poller failures do not stop the process.
+- WS sends best‑effort updates; failed clients are disconnected.
 
-## State Consistency
-- Supervisor uses an async lock for snapshot updates.
-- REST reads return consistent snapshot copies.
+## Safety Notes
+- Risky operations are protected by confirm + cooldown + unsafe gate.
 
-## Security and Safety
-- Optional API key via `X-API-Key`.
-- Risky endpoints require `{ "confirm": true }`.
-- Cooldown rate limits block rapid repeats.
-- Power actions require `NDEFENDER_ALLOW_UNSAFE=true`.
+## Troubleshooting
+- Confirm pollers are running by watching WS updates.
+- Logs show poller errors with module context.
+
+## Configuration
+- Poll intervals: `NDEFENDER_*_INTERVAL_S`
+- UPS settings: `NDEFENDER_UPS_I2C_*`
+
+## Performance Notes
+- Snapshot updates are protected by an async lock.
+- WS fan‑out uses per‑socket send locks to avoid interleaving.
+
+## Security Notes
+- Optional API key is enforced at REST endpoints.
+- WS currently does not enforce API key and is intended for LAN use.
