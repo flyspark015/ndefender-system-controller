@@ -77,6 +77,9 @@ class Supervisor:
                 audio=self._state.audio.model_copy(),
             )
 
+    def services_restart(self, name: str) -> bool:
+        return self._services.restart(name)
+
     async def _update_system(self, stats: SystemStats) -> None:
         async with self._lock:
             self._state.system = stats

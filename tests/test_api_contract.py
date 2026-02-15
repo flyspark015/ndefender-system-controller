@@ -34,3 +34,9 @@ def test_ups_endpoint():
     assert resp.status_code == 200
     data = resp.json()
     assert "state" in data
+
+
+def test_services_endpoint():
+    resp = client.get("/api/v1/services")
+    assert resp.status_code == 200
+    assert isinstance(resp.json(), list)
