@@ -27,3 +27,10 @@ def test_system_endpoint():
     assert resp.status_code == 200
     data = resp.json()
     assert "uptime_s" in data
+
+
+def test_ups_endpoint():
+    resp = client.get("/api/v1/ups")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert "state" in data

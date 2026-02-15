@@ -45,3 +45,18 @@ class SchedulerConfig:
             network_interval_s=float(os.getenv("NDEFENDER_NETWORK_INTERVAL_S", "5")),
             audio_interval_s=float(os.getenv("NDEFENDER_AUDIO_INTERVAL_S", "5")),
         )
+
+
+@dataclass(frozen=True)
+class UpsConfig:
+    i2c_bus: int = 1
+    i2c_addr: int = 0x2D
+    keepalive_interval_s: float = 5.0
+
+    @staticmethod
+    def from_env() -> "UpsConfig":
+        return UpsConfig(
+            i2c_bus=int(os.getenv("NDEFENDER_UPS_I2C_BUS", "1")),
+            i2c_addr=int(os.getenv("NDEFENDER_UPS_I2C_ADDR", "0x2d"), 0),
+            keepalive_interval_s=float(os.getenv("NDEFENDER_UPS_KEEPALIVE_S", "5")),
+        )

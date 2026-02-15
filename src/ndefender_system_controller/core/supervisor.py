@@ -2,7 +2,7 @@ import asyncio
 import logging
 from dataclasses import dataclass, field
 
-from ..config import SchedulerConfig
+from ..config import SchedulerConfig, UpsConfig
 from ..models import (
     AudioStatus,
     NetworkStatus,
@@ -39,7 +39,7 @@ class Supervisor:
         self._tasks: list[asyncio.Task] = []
         self._state = SupervisorState()
         self._system = SystemStatsCollector()
-        self._ups = UpsHatE()
+        self._ups = UpsHatE(UpsConfig.from_env())
         self._services = SystemdManager()
         self._network = NetworkManager()
         self._audio = AudioManager()

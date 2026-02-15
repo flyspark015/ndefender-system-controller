@@ -3,12 +3,12 @@
 - [x] Step 1: Skeleton app + CI + minimal endpoints
 - [x] Step 2: Supervisor state store + scheduler + WS fan-out
 - [x] Step 3: System stats module + /api/v1/system
+- [x] Step 4: UPS HAT (E) module + keepalive + /api/v1/ups
 
 🟡 In Progress
-- [ ] Step 4: UPS HAT (E) module + keepalive + /api/v1/ups
+- [ ] Step 5: Systemd service manager + restart guard + /api/v1/services
 
 ❌ Pending
-- [ ] Step 5: Systemd service manager + restart guard + /api/v1/services
 - [ ] Step 6: Network manager + /api/v1/network
 - [ ] Step 7: Audio manager + /api/v1/audio
 - [ ] Step 8: Power controls (guarded reboot/shutdown)
