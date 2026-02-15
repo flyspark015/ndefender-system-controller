@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 from .api.routes_status import router as status_router
+from .api.routes_system import router as system_router
 from .api.ws import WsManager
 from .api.ws import router as ws_router
 from .config import SchedulerConfig
@@ -27,6 +28,7 @@ def create_app() -> FastAPI:
     app.state.ws_manager = ws_manager
     app.state.supervisor = supervisor
     app.include_router(status_router, prefix="/api/v1", tags=["status"])
+    app.include_router(system_router, prefix="/api/v1", tags=["system"])
     app.include_router(ws_router, prefix="/api/v1", tags=["ws"])
     return app
 

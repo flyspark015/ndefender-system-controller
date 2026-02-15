@@ -20,3 +20,10 @@ def test_status_stub():
     data = resp.json()
     assert isinstance(data["timestamp_ms"], int)
     assert data["services"] == []
+
+
+def test_system_endpoint():
+    resp = client.get("/api/v1/system")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert "uptime_s" in data

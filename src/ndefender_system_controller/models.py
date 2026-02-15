@@ -20,6 +20,7 @@ class SystemStats(BaseModel):
     ram_total_mb: int | None = None
     disk_used_gb: int | None = None
     disk_total_gb: int | None = None
+    throttled_flags: int | None = None
 
 
 class UpsStatus(BaseModel):
