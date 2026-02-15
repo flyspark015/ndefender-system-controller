@@ -2,6 +2,12 @@
 
 Production-grade system control plane for Raspberry Pi 5. This service provides a single API surface for UPS telemetry, system health, services, network, audio, and safe power controls.
 
+## System Overview 🧭
+- FastAPI app with background pollers and a central state snapshot
+- WebSocket fan-out for incremental updates
+- Guarded power controls and rate limits for risky actions
+- Optional API key authentication
+
 ## Quick Start 🚀
 ```
 python3 -m venv .venv
@@ -9,12 +15,6 @@ source .venv/bin/activate
 pip install -e .[dev]
 uvicorn ndefender_system_controller.main:app --host 0.0.0.0 --port 8000
 ```
-
-## API Base 🌐
-- Base path: `/api/v1`
-- Health: `GET /api/v1/health`
-- Status: `GET /api/v1/status`
-- WS: `WS /api/v1/ws`
 
 ## Configuration 🧩
 Environment variables:
@@ -29,9 +29,21 @@ Environment variables:
 - `NDEFENDER_UPS_I2C_ADDR` (default: 0x2d)
 - `NDEFENDER_UPS_KEEPALIVE_S` (default: 5)
 
+## API Base 🌐
+- Base path: `/api/v1`
+- Health: `GET /api/v1/health`
+- Status: `GET /api/v1/status`
+- WS: `WS /api/v1/ws`
+
 ## Dev Tools 🧰
 - `tools/dev_client.py` (REST + WS)
 - `tools/ups_dump.py` (direct UPS read)
+
+## Verification ✅
+```
+ruff check .
+pytest
+```
 
 ## GREEN Checklist ✅
 - App boots with `uvicorn`
@@ -44,15 +56,13 @@ Environment variables:
 - systemd unit sample works on Pi
 - Guarded endpoints enforce `confirm` + cooldown
 
-## Development ✅
-```
-ruff check .
-pytest
-```
-
 ## Docs 📘
 - `ROADMAP.md`
+- `progress.md`
+- `docs/ARCHITECTURE.md`
 - `docs/API.md`
+- `docs/USAGE.md`
+- `docs/TESTING.md`
 - `docs/DEPLOYMENT.md`
 - `docs/SYSTEM_CONTROLS.md`
 - `docs/UPS_HAT_E.md`

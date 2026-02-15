@@ -23,10 +23,11 @@ WantedBy=multi-user.target
 
 ## Install Steps
 1. Copy repo to `/opt/ndefender-system-controller`
-2. Create venv and install deps: `python3 -m venv .venv && . .venv/bin/activate && pip install -e .[dev]`
-3. Copy the unit file to `/etc/systemd/system/ndefender-system-controller.service`
-4. `sudo systemctl daemon-reload`
-5. `sudo systemctl enable --now ndefender-system-controller`
+2. Create venv: `python3 -m venv .venv`
+3. Install deps: `. .venv/bin/activate && pip install -e .[dev]`
+4. Copy the unit file to `/etc/systemd/system/ndefender-system-controller.service`
+5. Reload: `sudo systemctl daemon-reload`
+6. Enable: `sudo systemctl enable --now ndefender-system-controller`
 
 ## Logs
 - `journalctl -u ndefender-system-controller -f`

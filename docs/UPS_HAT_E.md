@@ -5,7 +5,7 @@
 - Address: `0x2d`
 - Keepalive: write `0x55` to register `0x01`
 
-## Register Map (Vendor)
+## Register Map
 - `0x02` (1 byte): status flags
   - `0x40` fast charging
   - `0x80` charging
@@ -27,5 +27,5 @@
 - `per_cell_v[4]`, `state`
 
 ## Notes
-- Keepalive is sent on a timer; it does not block polling.
-- Read failures return an empty UPS model rather than crashing the service.
+- Keepalive is sent on a timer and does not block polling.
+- Read failures return empty UPS models rather than crashing the service.

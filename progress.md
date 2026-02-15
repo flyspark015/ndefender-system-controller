@@ -9,6 +9,7 @@
 - [x] Step 7: Audio manager + /api/v1/audio
 - [x] Step 8: Power controls (guarded reboot/shutdown)
 - [x] Step 9: Docs hardening + deployment + dev tools
+- [x] Documentation pass: full API, architecture, usage, testing
 
 🟡 In Progress
 - [ ] Step 10: Release lock + v1.0.0 tag
@@ -21,5 +22,5 @@
   - Output: `All checks passed!`
   - Status: ✅
 - Command: `pytest`
-  - Output: `15 passed in 1.14s` (sample)
+  - Output: `15 passed in 1.54s` (sample)
   - Status: ✅

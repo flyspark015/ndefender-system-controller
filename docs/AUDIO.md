@@ -7,6 +7,6 @@ Fields:
 - `volume_percent`
 - `muted`
 
-## Notes
-- Uses `amixer` to read ALSA Master channel.
-- Set/mute controls are planned for Step 7+ hardening.
+## Implementation Notes
+- Reads ALSA Master via `amixer`.
+- Read-only for now; set/mute controls are planned.
