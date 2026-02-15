@@ -1,14 +1,40 @@
 # API 📘
 
-This document will expand in later steps. Current endpoints:
-- `GET /api/v1/health`
-- `GET /api/v1/status`
-- `GET /api/v1/system`
-- `GET /api/v1/ups`
-- `GET /api/v1/services`
-- `POST /api/v1/services/{name}/restart`
-- `GET /api/v1/network`
-- `GET /api/v1/audio`
-- `POST /api/v1/system/reboot`
-- `POST /api/v1/system/shutdown`
-- `WS /api/v1/ws`
+Base path: `/api/v1`
+
+## REST
+- `GET /health`
+- `GET /status`
+- `GET /system`
+- `GET /ups`
+- `GET /services`
+- `POST /services/{name}/restart`
+- `GET /network`
+- `GET /audio`
+- `POST /system/reboot`
+- `POST /system/shutdown`
+
+## Auth
+- Optional API key header: `X-API-Key: <key>`
+
+## WebSocket
+- `WS /ws`
+
+Envelope:
+```
+{
+  "type": "...",
+  "timestamp_ms": 0,
+  "source": "system",
+  "data": {}
+}
+```
+
+Allowed WS types:
+- `SYSTEM_STATUS`
+- `UPS_UPDATE`
+- `SERVICE_UPDATE`
+- `NETWORK_UPDATE`
+- `AUDIO_UPDATE`
+- `LOG_EVENT`
+- `COMMAND_ACK`

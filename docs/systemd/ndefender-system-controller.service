@@ -1,0 +1,15 @@
+[Unit]
+Description=N-Defender System Controller API
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/ndefender-system-controller
+ExecStart=/opt/ndefender-system-controller/.venv/bin/uvicorn ndefender_system_controller.main:app --host 0.0.0.0 --port 8000
+Restart=always
+RestartSec=3
+Environment=NDEFENDER_API_KEY=
+Environment=NDEFENDER_ALLOW_UNSAFE=false
+
+[Install]
+WantedBy=multi-user.target

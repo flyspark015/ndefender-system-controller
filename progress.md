@@ -8,17 +8,18 @@
 - [x] Step 6: Network manager + /api/v1/network
 - [x] Step 7: Audio manager + /api/v1/audio
 - [x] Step 8: Power controls (guarded reboot/shutdown)
+- [x] Step 9: Docs hardening + deployment + dev tools
 
 🟡 In Progress
-- [ ] Step 9: Docs hardening + deployment + dev tools
+- [ ] Step 10: Release lock + v1.0.0 tag
 
 ❌ Pending
-- [ ] Step 10: Release lock + v1.0.0 tag
+- None
 
 ## Verification Log ✅
 - Command: `ruff check .`
   - Output: `All checks passed!`
   - Status: ✅
 - Command: `pytest`
-  - Output: `15 passed in 1.23s` (sample)
+  - Output: `15 passed in 1.14s` (sample)
   - Status: ✅

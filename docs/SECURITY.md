@@ -1,5 +1,9 @@
 # Security 🔒
 
-- API key auth via `X-API-Key` is supported.
-- Risky operations require explicit confirmation and cooldown rate limits.
-- Power controls are disabled by default unless `NDEFENDER_ALLOW_UNSAFE=true`.
+## API Key
+Set `NDEFENDER_API_KEY` and send `X-API-Key` with requests.
+
+## Risky Operations
+- Restart, reboot, and shutdown require `{"confirm": true}`
+- Cooldown rate limits are enforced
+- Power controls are disabled unless `NDEFENDER_ALLOW_UNSAFE=true`
