@@ -40,3 +40,10 @@ def test_services_endpoint():
     resp = client.get("/api/v1/services")
     assert resp.status_code == 200
     assert isinstance(resp.json(), list)
+
+
+def test_network_endpoint():
+    resp = client.get("/api/v1/network")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert "connected" in data

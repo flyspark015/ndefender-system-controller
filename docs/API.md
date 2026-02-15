@@ -7,4 +7,5 @@ This document will expand in later steps. Current endpoints:
 - `GET /api/v1/ups`
 - `GET /api/v1/services`
 - `POST /api/v1/services/{name}/restart`
+- `GET /api/v1/network`
 - `WS /api/v1/ws`
