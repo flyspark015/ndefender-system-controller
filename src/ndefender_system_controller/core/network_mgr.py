@@ -1,3 +1,6 @@
+from ..models import NetworkStatus
+
+
 class NetworkManager:
-    def status(self) -> dict:
-        return {}
+    def status(self) -> NetworkStatus:
+        return NetworkStatus()

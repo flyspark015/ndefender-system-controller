@@ -1,3 +1,6 @@
+from ..models import SystemStats
+
+
 class SystemStatsCollector:
-    def read(self) -> dict:
-        return {}
+    def read(self) -> SystemStats:
+        return SystemStats()

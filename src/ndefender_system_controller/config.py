@@ -26,3 +26,22 @@ class AppConfig:
             api_key=os.getenv("NDEFENDER_API_KEY") or None,
             allow_unsafe=_env_bool("NDEFENDER_ALLOW_UNSAFE", False),
         )
+
+
+@dataclass(frozen=True)
+class SchedulerConfig:
+    system_interval_s: float = 2.0
+    ups_interval_s: float = 2.0
+    services_interval_s: float = 5.0
+    network_interval_s: float = 5.0
+    audio_interval_s: float = 5.0
+
+    @staticmethod
+    def from_env() -> "SchedulerConfig":
+        return SchedulerConfig(
+            system_interval_s=float(os.getenv("NDEFENDER_SYSTEM_INTERVAL_S", "2")),
+            ups_interval_s=float(os.getenv("NDEFENDER_UPS_INTERVAL_S", "2")),
+            services_interval_s=float(os.getenv("NDEFENDER_SERVICES_INTERVAL_S", "5")),
+            network_interval_s=float(os.getenv("NDEFENDER_NETWORK_INTERVAL_S", "5")),
+            audio_interval_s=float(os.getenv("NDEFENDER_AUDIO_INTERVAL_S", "5")),
+        )

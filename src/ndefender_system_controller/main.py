@@ -1,13 +1,31 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 
 from .api.routes_status import router as status_router
+from .api.ws import WsManager
 from .api.ws import router as ws_router
+from .config import SchedulerConfig
+from .core.supervisor import Supervisor
 from .util.logging import configure_logging
 
 
-def create_app() -> FastAPI:
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     configure_logging()
-    app = FastAPI(title="N-Defender System Controller API")
+    await app.state.supervisor.start()
+    try:
+        yield
+    finally:
+        await app.state.supervisor.stop()
+
+
+def create_app() -> FastAPI:
+    app = FastAPI(title="N-Defender System Controller API", lifespan=lifespan)
+    ws_manager = WsManager()
+    supervisor = Supervisor(SchedulerConfig.from_env(), ws_manager)
+    app.state.ws_manager = ws_manager
+    app.state.supervisor = supervisor
     app.include_router(status_router, prefix="/api/v1", tags=["status"])
     app.include_router(ws_router, prefix="/api/v1", tags=["ws"])
     return app

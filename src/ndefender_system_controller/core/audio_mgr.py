@@ -1,3 +1,6 @@
+from ..models import AudioStatus
+
+
 class AudioManager:
-    def status(self) -> dict:
-        return {}
+    def status(self) -> AudioStatus:
+        return AudioStatus()
