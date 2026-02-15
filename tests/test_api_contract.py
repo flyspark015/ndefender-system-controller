@@ -47,3 +47,10 @@ def test_network_endpoint():
     assert resp.status_code == 200
     data = resp.json()
     assert "connected" in data
+
+
+def test_audio_endpoint():
+    resp = client.get("/api/v1/audio")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert "muted" in data

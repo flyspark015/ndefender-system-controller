@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
+from .api.routes_audio import router as audio_router
 from .api.routes_network import router as network_router
 from .api.routes_services import router as services_router
 from .api.routes_status import router as status_router
@@ -35,6 +36,7 @@ def create_app() -> FastAPI:
     app.include_router(ups_router, prefix="/api/v1", tags=["ups"])
     app.include_router(services_router, prefix="/api/v1", tags=["services"])
     app.include_router(network_router, prefix="/api/v1", tags=["network"])
+    app.include_router(audio_router, prefix="/api/v1", tags=["audio"])
     app.include_router(ws_router, prefix="/api/v1", tags=["ws"])
     return app
 
