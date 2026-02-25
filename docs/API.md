@@ -25,6 +25,25 @@ UPS:
 ```bash
 curl -s http://127.0.0.1:8000/api/v1/ups
 ```
+Example response:
+```json
+{
+  "pack_voltage_v": 16.64,
+  "current_a": -0.01,
+  "input_vbus_v": 0.0,
+  "input_power_w": 0.0,
+  "soc_percent": 98,
+  "state": "IDLE",
+  "time_to_empty_s": 0,
+  "time_to_full_s": 0,
+  "status": "ok"
+}
+```
+Units:
+- Voltage in volts (`_v`)
+- Current in amps (`_a`)
+- Power in watts (`_w`)
+- Percent in 0–100
 
 WebSocket (dev client):
 ```bash
