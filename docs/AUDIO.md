@@ -1,7 +1,7 @@
 # Audio 🔊
 
 ## Overview
-Audio module provides read‑only volume and mute state via ALSA.
+Audio module provides volume and mute state plus guarded set endpoints via ALSA.
 
 ## Architecture
 - Reads `amixer get Master` for percent and mute flags.
@@ -11,11 +11,25 @@ Audio module provides read‑only volume and mute state via ALSA.
 curl -s http://127.0.0.1:8000/api/v1/audio
 ```
 
+Mute:
+```bash
+curl -s -X POST http://127.0.0.1:8000/api/v1/audio/mute \
+  -H 'content-type: application/json' \
+  -d '{"payload":{"muted":true},"confirm":false}'
+```
+
+Volume:
+```bash
+curl -s -X POST http://127.0.0.1:8000/api/v1/audio/volume \
+  -H 'content-type: application/json' \
+  -d '{"payload":{"volume_percent":50},"confirm":false}'
+```
+
 ## Failure Modes
-- If `amixer` is missing, volume/mute may be null.
+- If `amixer` is missing, volume/mute may be null and commands return `409 invalid_state`.
 
 ## Safety Notes
-- Read‑only; no volume changes are applied.
+- Audio commands are rate‑limited (10/min).
 
 ## Troubleshooting
 - Verify ALSA: `amixer get Master`.

@@ -1,13 +1,47 @@
 import subprocess
 
 from ..models import AudioStatus
+from ..util.time import now_ms
 
 
 class AudioManager:
     def status(self) -> AudioStatus:
         volume = self._get_volume()
         muted = self._get_mute()
-        return AudioStatus(volume_percent=volume, muted=muted)
+        status = "ok" if volume is not None or muted is not None else "degraded"
+        last_error = None if status == "ok" else "audio_unavailable"
+        return AudioStatus(
+            timestamp_ms=now_ms(),
+            status=status,
+            volume_percent=volume,
+            muted=muted,
+            last_error=last_error,
+        )
+
+    def set_mute(self, muted: bool) -> bool:
+        try:
+            subprocess.run(
+                ["amixer", "set", "Master", "mute" if muted else "unmute"],
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+            return True
+        except Exception:
+            return False
+
+    def set_volume(self, volume_percent: int) -> bool:
+        try:
+            volume = max(0, min(100, int(volume_percent)))
+            subprocess.run(
+                ["amixer", "set", "Master", f"{volume}%"],
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+            return True
+        except Exception:
+            return False
 
     @staticmethod
     def _get_volume() -> int | None:

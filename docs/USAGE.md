@@ -35,14 +35,32 @@ curl -s -X POST http://127.0.0.1:8000/api/v1/services/ndefender-backend/restart 
   -d '{"payload":{},"confirm":true}'
 ```
 
+Network (Wi‑Fi state):
+```bash
+curl -s http://127.0.0.1:8000/api/v1/network/wifi/state
+```
+
+GPS:
+```bash
+curl -s http://127.0.0.1:8000/api/v1/gps
+```
+
+Audio mute:
+```bash
+curl -s -X POST http://127.0.0.1:8000/api/v1/audio/mute \
+  -H 'content-type: application/json' \
+  -d '{"payload":{"muted":true},"confirm":false}'
+```
+
 WebSocket:
 ```bash
 python3 tools/dev_client.py ws --base-url http://127.0.0.1:8000
 ```
 
 ## Failure Modes
-- 400 indicates confirm required.
+- 400 indicates confirm required or invalid payload.
 - 403 indicates unsafe operations disabled.
+- 409 indicates invalid state.
 - 429 indicates rate limited.
 
 ## Safety Notes

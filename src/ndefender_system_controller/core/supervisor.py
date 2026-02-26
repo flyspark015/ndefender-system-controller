@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 from ..config import SchedulerConfig, UpsConfig
 from ..models import (
     AudioStatus,
+    GpsState,
     NetworkStatus,
     ServiceStatus,
     StatusSnapshot,
@@ -14,6 +15,7 @@ from ..models import (
 )
 from ..util.time import now_ms
 from .audio_mgr import AudioManager
+from .gps_mgr import GpsManager
 from .network_mgr import NetworkManager
 from .system_stats import SystemStatsCollector
 from .systemd_mgr import SystemdManager
@@ -28,6 +30,7 @@ class SupervisorState:
     ups: UpsStatus = field(default_factory=UpsStatus)
     services: list[ServiceStatus] = field(default_factory=list)
     network: NetworkStatus = field(default_factory=NetworkStatus)
+    gps: GpsState = field(default_factory=GpsState)
     audio: AudioStatus = field(default_factory=AudioStatus)
 
 
@@ -42,6 +45,7 @@ class Supervisor:
         self._ups = UpsHatE(UpsConfig.from_env())
         self._services = SystemdManager()
         self._network = NetworkManager()
+        self._gps = GpsManager()
         self._audio = AudioManager()
         self._running = False
 
@@ -54,6 +58,7 @@ class Supervisor:
             asyncio.create_task(self._poll_ups_loop(), name="poll_ups"),
             asyncio.create_task(self._poll_services_loop(), name="poll_services"),
             asyncio.create_task(self._poll_network_loop(), name="poll_network"),
+            asyncio.create_task(self._poll_gps_loop(), name="poll_gps"),
             asyncio.create_task(self._poll_audio_loop(), name="poll_audio"),
         ]
 
@@ -74,8 +79,18 @@ class Supervisor:
                 ups=self._state.ups.model_copy(),
                 services=[svc.model_copy() for svc in self._state.services],
                 network=self._state.network.model_copy(),
+                gps=self._state.gps.model_copy(),
                 audio=self._state.audio.model_copy(),
             )
+
+    def network_manager(self) -> NetworkManager:
+        return self._network
+
+    def audio_manager(self) -> AudioManager:
+        return self._audio
+
+    def gps_manager(self) -> GpsManager:
+        return self._gps
 
     def services_restart(self, name: str) -> bool:
         return self._services.restart(name)
@@ -124,6 +139,17 @@ class Supervisor:
             )
         )
 
+    async def _update_gps(self, gps: GpsState) -> None:
+        async with self._lock:
+            self._state.gps = gps
+        await self._broadcaster.broadcast(
+            WsEnvelope(
+                type="GPS_UPDATE",
+                timestamp_ms=now_ms(),
+                data=gps.model_dump(exclude_none=True),
+            )
+        )
+
     async def _update_audio(self, audio: AudioStatus) -> None:
         async with self._lock:
             self._state.audio = audio
@@ -166,6 +192,14 @@ class Supervisor:
             except Exception:
                 logger.exception("Network poll failed")
             await asyncio.sleep(self._scheduler.network_interval_s)
+
+    async def _poll_gps_loop(self) -> None:
+        while True:
+            try:
+                await self._update_gps(self._gps.status())
+            except Exception:
+                logger.exception("GPS poll failed")
+            await asyncio.sleep(self._scheduler.gps_interval_s)
 
     async def _poll_audio_loop(self) -> None:
         while True:

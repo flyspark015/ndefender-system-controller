@@ -6,6 +6,7 @@ from smbus2 import SMBus
 
 from ..config import UpsConfig
 from ..models import UpsStatus
+from ..util.time import now_ms
 
 logger = logging.getLogger(__name__)
 
@@ -25,14 +26,18 @@ class UpsHatE:
         self._last_keepalive_ts = 0.0
 
     def read_status(self) -> UpsStatus:
+        timestamp_ms = now_ms()
         try:
             raw = self._read_raw()
             if raw is None:
-                return UpsStatus()
-            return self.decode(raw)
+                return UpsStatus(timestamp_ms=timestamp_ms, status="offline", last_error="ups_unavailable")
+            decoded = self.decode(raw)
+            decoded.timestamp_ms = timestamp_ms
+            decoded.status = "ok"
+            return decoded
         except Exception:
             logger.exception("UPS read failed")
-            return UpsStatus()
+            return UpsStatus(timestamp_ms=timestamp_ms, status="offline", last_error="ups_read_failed")
 
     def _read_raw(self) -> UpsRaw | None:
         bus = self._ensure_bus()

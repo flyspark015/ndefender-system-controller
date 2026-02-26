@@ -1,16 +1,17 @@
+import uuid
+
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel
 
 from ..config import AppConfig
 from ..core.power_control import PowerController
 from ..core.supervisor import Supervisor
-from ..models import SystemStats, WsEnvelope
-from ..util.rate_limit import Cooldown
+from ..models import CommandResult, SystemStats
+from ..util.rate_limit import RateLimiter
 from ..util.time import now_ms
 
 router = APIRouter()
-_reboot_cooldown = Cooldown(interval_s=30)
-_shutdown_cooldown = Cooldown(interval_s=30)
+_danger_rate = RateLimiter(limit=2, window_s=60)
 
 
 class PowerRequest(BaseModel):
@@ -36,18 +37,22 @@ async def system_status(supervisor: Supervisor = Depends(get_supervisor)) -> Sys
 async def system_reboot(
     body: PowerRequest,
     config: AppConfig = Depends(get_config),
-) -> WsEnvelope:
+) -> CommandResult:
     if not body.confirm:
         raise HTTPException(status_code=400, detail="confirm_required")
-    if not _reboot_cooldown.allow():
+    if not _danger_rate.allow():
         raise HTTPException(status_code=429, detail="rate_limited")
     ok, reason = PowerController(config).reboot()
     if not ok and reason == "unsafe_disabled":
         raise HTTPException(status_code=403, detail="unsafe_disabled")
-    return WsEnvelope(
-        type="COMMAND_ACK",
+    if not ok:
+        raise HTTPException(status_code=409, detail=reason or "invalid_state")
+    return CommandResult(
+        command="system/reboot",
+        command_id=str(uuid.uuid4()),
+        accepted=True,
+        detail=None,
         timestamp_ms=now_ms(),
-        data={"command": "reboot", "ok": ok, "reason": reason},
     )
 
 
@@ -55,16 +60,20 @@ async def system_reboot(
 async def system_shutdown(
     body: PowerRequest,
     config: AppConfig = Depends(get_config),
-) -> WsEnvelope:
+) -> CommandResult:
     if not body.confirm:
         raise HTTPException(status_code=400, detail="confirm_required")
-    if not _shutdown_cooldown.allow():
+    if not _danger_rate.allow():
         raise HTTPException(status_code=429, detail="rate_limited")
     ok, reason = PowerController(config).shutdown()
     if not ok and reason == "unsafe_disabled":
         raise HTTPException(status_code=403, detail="unsafe_disabled")
-    return WsEnvelope(
-        type="COMMAND_ACK",
+    if not ok:
+        raise HTTPException(status_code=409, detail=reason or "invalid_state")
+    return CommandResult(
+        command="system/shutdown",
+        command_id=str(uuid.uuid4()),
+        accepted=True,
+        detail=None,
         timestamp_ms=now_ms(),
-        data={"command": "shutdown", "ok": ok, "reason": reason},
     )

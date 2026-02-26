@@ -17,15 +17,17 @@ Reboot (guarded):
 ```bash
 curl -s -X POST http://127.0.0.1:8000/api/v1/system/reboot \
   -H 'content-type: application/json' \
-  -d '{"confirm": true}'
+  -d '{"payload":{},"confirm":true}'
 ```
 
 ## Failure Modes
-- Power actions return 403 if unsafe operations disabled.
-- Cooldown returns 429 on repeated requests.
+- `400` `{"detail":"confirm_required"}`
+- `403` `{"detail":"unsafe_disabled"}`
+- `409` `{"detail":"invalid_state"}`
+- `429` `{"detail":"rate_limited"}`
 
 ## Safety Notes
-- Always require `{ "confirm": true }`.
+- Always require `{ "payload": {}, "confirm": true }`.
 - Keep `NDEFENDER_ALLOW_UNSAFE=false` unless required.
 
 ## Troubleshooting

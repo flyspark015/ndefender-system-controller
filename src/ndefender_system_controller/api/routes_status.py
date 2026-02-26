@@ -3,7 +3,6 @@ from fastapi import APIRouter, Depends, Request
 from ..config import AppConfig
 from ..core.supervisor import Supervisor
 from ..models import HealthResponse, StatusSnapshot, WsEnvelope
-from ..util.auth import ApiKeyAuth
 from ..util.time import now_ms
 
 router = APIRouter()
@@ -11,10 +10,6 @@ router = APIRouter()
 
 def get_config() -> AppConfig:
     return AppConfig.from_env()
-
-
-def get_auth(config: AppConfig = Depends(get_config)) -> ApiKeyAuth:
-    return ApiKeyAuth(config)
 
 
 def get_supervisor(request: Request) -> Supervisor:
@@ -26,7 +21,7 @@ def health(config: AppConfig = Depends(get_config)) -> HealthResponse:
     return HealthResponse(ok=True, timestamp_ms=now_ms(), version=config.version)
 
 
-@router.get("/status", response_model=StatusSnapshot, dependencies=[Depends(get_auth)])
+@router.get("/status", response_model=StatusSnapshot)
 async def status(supervisor: Supervisor = Depends(get_supervisor)) -> StatusSnapshot:
     return await supervisor.snapshot()
 

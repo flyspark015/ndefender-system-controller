@@ -1,7 +1,7 @@
 # 🚀 N-Defender System Controller API
 
 ## 📌 Overview
-N-Defender System Controller is a production-grade control plane for Raspberry Pi 5. It exposes a single API surface for UPS telemetry, system health, systemd supervision, network/audio visibility, and guarded power controls. The service is API-first, WS-capable, and safe-by-default for field deployment.
+N-Defender System Controller is a production-grade control plane for Raspberry Pi 5. It exposes a single API surface for UPS telemetry, system health, systemd supervision, network/audio controls, GPS status, and guarded power controls. The service is API-first, WS-capable, and safe-by-default for field deployment.
 
 ## 🧠 Architecture Summary
 ```
@@ -17,7 +17,7 @@ N-Defender System Controller is a production-grade control plane for Raspberry P
 +----+----+----+----+----+-----+
      |    |    |    |    |
      v    v    v    v    v
-  System  UPS Services Network Audio
+  System  UPS Services Network  GPS  Audio
   Stats   HAT  systemd   WiFi   ALSA
 ```
 
@@ -33,9 +33,10 @@ N-Defender System Controller is a production-grade control plane for Raspberry P
 - System stats: CPU temp/usage, uptime, load, RAM, disk, throttling flags
 - Services: systemd status + guarded restart endpoint
 
-## 🌐 Network & Audio
-- Network: SSID + IPs (read-only)
-- Audio: volume + mute state via ALSA (read-only)
+## 🌐 Network, GPS & Audio
+- Network: Wi‑Fi/Bluetooth state + guarded controls
+- GPS: fix + satellites + position (if gpsd available)
+- Audio: volume + mute state via ALSA + guarded controls
 
 ## 🔐 Security Model
 - No auth required in current deployment.
@@ -79,11 +80,8 @@ Restart=always
 
 ## 📜 Canonical Contract
 - Repo: `https://github.com/flyspark015/ndefender-api-contracts`
-- Commit: `72469d6983aaf8ff0c1dd8df9f9c3fee2fc8cdf7`
 
 ## 📈 Roadmap
-- Wi‑Fi connect/disconnect with guard rails
-- Audio set/mute controls
 - Extended UPS analytics and alerts
 - Config-driven service allowlist
 
@@ -110,7 +108,7 @@ Reboot (guarded):
 ```bash
 curl -s -X POST http://127.0.0.1:8000/api/v1/system/reboot \
   -H 'content-type: application/json' \
-  -d '{"confirm": true}'
+  -d '{"payload":{},"confirm":true}'
 ```
 
 Sample UPS JSON:

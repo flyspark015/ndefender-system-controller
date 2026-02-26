@@ -34,6 +34,7 @@ class SchedulerConfig:
     ups_interval_s: float = 2.0
     services_interval_s: float = 5.0
     network_interval_s: float = 5.0
+    gps_interval_s: float = 5.0
     audio_interval_s: float = 5.0
 
     @staticmethod
@@ -43,6 +44,7 @@ class SchedulerConfig:
             ups_interval_s=float(os.getenv("NDEFENDER_UPS_INTERVAL_S", "2")),
             services_interval_s=float(os.getenv("NDEFENDER_SERVICES_INTERVAL_S", "5")),
             network_interval_s=float(os.getenv("NDEFENDER_NETWORK_INTERVAL_S", "5")),
+            gps_interval_s=float(os.getenv("NDEFENDER_GPS_INTERVAL_S", "5")),
             audio_interval_s=float(os.getenv("NDEFENDER_AUDIO_INTERVAL_S", "5")),
         )
 
