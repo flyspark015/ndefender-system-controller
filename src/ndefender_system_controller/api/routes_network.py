@@ -64,6 +64,22 @@ async def wifi_enable(body: CommandRequest, supervisor: Supervisor = Depends(get
     )
 
 
+@router.post("/network/wifi/disable", response_model=CommandResult)
+async def wifi_disable(body: CommandRequest, supervisor: Supervisor = Depends(get_supervisor)) -> CommandResult:
+    if not _command_rate.allow():
+        raise HTTPException(status_code=429, detail="rate_limited")
+    ok = supervisor.network_manager().wifi_enable(False)
+    if not ok:
+        raise HTTPException(status_code=409, detail="invalid_state")
+    return CommandResult(
+        command="network/wifi/disable",
+        command_id=str(uuid.uuid4()),
+        accepted=True,
+        detail=None,
+        timestamp_ms=now_ms(),
+    )
+
+
 @router.post("/network/wifi/connect", response_model=CommandResult)
 async def wifi_connect(body: CommandRequest, supervisor: Supervisor = Depends(get_supervisor)) -> CommandResult:
     if not _command_rate.allow():
@@ -111,6 +127,22 @@ async def bluetooth_enable(body: CommandRequest, supervisor: Supervisor = Depend
         raise HTTPException(status_code=409, detail="invalid_state")
     return CommandResult(
         command="network/bluetooth/enable",
+        command_id=str(uuid.uuid4()),
+        accepted=True,
+        detail=None,
+        timestamp_ms=now_ms(),
+    )
+
+
+@router.post("/network/bluetooth/disable", response_model=CommandResult)
+async def bluetooth_disable(body: CommandRequest, supervisor: Supervisor = Depends(get_supervisor)) -> CommandResult:
+    if not _command_rate.allow():
+        raise HTTPException(status_code=429, detail="rate_limited")
+    ok = supervisor.network_manager().bluetooth_enable(False)
+    if not ok:
+        raise HTTPException(status_code=409, detail="invalid_state")
+    return CommandResult(
+        command="network/bluetooth/disable",
         command_id=str(uuid.uuid4()),
         accepted=True,
         detail=None,
