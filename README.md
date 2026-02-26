@@ -38,8 +38,8 @@ N-Defender System Controller is a production-grade control plane for Raspberry P
 - Audio: volume + mute state via ALSA (read-only)
 
 ## 🔐 Security Model
-- Optional API key header: `X-API-Key: <key>`
-- Risky operations require `{ "confirm": true }`
+- No auth required in current deployment.
+- Risky operations require `{ "payload": {}, "confirm": true }`
 - Cooldown rate limits prevent repeated triggers
 - Power actions blocked unless `NDEFENDER_ALLOW_UNSAFE=true`
 
@@ -76,6 +76,10 @@ Restart=always
 - [x] Services verified via systemctl status
 - [x] WebSocket verified (HELLO + SYSTEM_STATUS)
 - [x] API endpoints verified (REST + WS)
+
+## 📜 Canonical Contract
+- Repo: `https://github.com/flyspark015/ndefender-api-contracts`
+- Commit: `72469d6983aaf8ff0c1dd8df9f9c3fee2fc8cdf7`
 
 ## 📈 Roadmap
 - Wi‑Fi connect/disconnect with guard rails

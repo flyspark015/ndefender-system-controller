@@ -14,6 +14,7 @@ _shutdown_cooldown = Cooldown(interval_s=30)
 
 
 class PowerRequest(BaseModel):
+    payload: dict = {}
     confirm: bool = False
 
 
@@ -37,12 +38,12 @@ async def system_reboot(
     config: AppConfig = Depends(get_config),
 ) -> WsEnvelope:
     if not body.confirm:
-        raise HTTPException(status_code=400, detail="confirm must be true")
+        raise HTTPException(status_code=400, detail="confirm_required")
     if not _reboot_cooldown.allow():
-        raise HTTPException(status_code=429, detail="cooldown active")
+        raise HTTPException(status_code=429, detail="rate_limited")
     ok, reason = PowerController(config).reboot()
     if not ok and reason == "unsafe_disabled":
-        raise HTTPException(status_code=403, detail="unsafe operations disabled")
+        raise HTTPException(status_code=403, detail="unsafe_disabled")
     return WsEnvelope(
         type="COMMAND_ACK",
         timestamp_ms=now_ms(),
@@ -56,12 +57,12 @@ async def system_shutdown(
     config: AppConfig = Depends(get_config),
 ) -> WsEnvelope:
     if not body.confirm:
-        raise HTTPException(status_code=400, detail="confirm must be true")
+        raise HTTPException(status_code=400, detail="confirm_required")
     if not _shutdown_cooldown.allow():
-        raise HTTPException(status_code=429, detail="cooldown active")
+        raise HTTPException(status_code=429, detail="rate_limited")
     ok, reason = PowerController(config).shutdown()
     if not ok and reason == "unsafe_disabled":
-        raise HTTPException(status_code=403, detail="unsafe operations disabled")
+        raise HTTPException(status_code=403, detail="unsafe_disabled")
     return WsEnvelope(
         type="COMMAND_ACK",
         timestamp_ms=now_ms(),

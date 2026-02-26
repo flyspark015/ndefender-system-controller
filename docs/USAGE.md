@@ -32,7 +32,7 @@ Restart (guarded):
 ```bash
 curl -s -X POST http://127.0.0.1:8000/api/v1/services/ndefender-backend/restart \
   -H 'content-type: application/json' \
-  -d '{"confirm": true}'
+  -d '{"payload":{},"confirm":true}'
 ```
 
 WebSocket:
@@ -41,12 +41,12 @@ python3 tools/dev_client.py ws --base-url http://127.0.0.1:8000
 ```
 
 ## Failure Modes
-- 401 indicates missing/invalid API key.
+- 400 indicates confirm required.
 - 403 indicates unsafe operations disabled.
-- 429 indicates cooldown active.
+- 429 indicates rate limited.
 
 ## Safety Notes
-- Always send `{ "confirm": true }` for risky endpoints.
+- Always send `{ "payload": {}, "confirm": true }` for risky endpoints.
 - Power actions are disabled unless explicitly enabled.
 
 ## Troubleshooting
@@ -54,12 +54,10 @@ python3 tools/dev_client.py ws --base-url http://127.0.0.1:8000
 - Tail logs: `journalctl -u ndefender-system-controller -f`.
 
 ## Configuration
-- `NDEFENDER_API_KEY` for auth.
 - `NDEFENDER_ALLOW_UNSAFE=true` to enable reboot/shutdown.
 
 ## Performance Notes
 - For high‑frequency clients, use WS updates instead of polling.
 
 ## Security Notes
-- Use API key on untrusted networks.
 - Keep unsafe operations disabled in production.

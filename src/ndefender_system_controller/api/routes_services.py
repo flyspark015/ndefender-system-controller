@@ -11,6 +11,7 @@ _restart_cooldown = Cooldown(interval_s=10)
 
 
 class RestartRequest(BaseModel):
+    payload: dict = {}
     confirm: bool = False
 
 
@@ -31,12 +32,12 @@ async def restart_service(
     supervisor: Supervisor = Depends(get_supervisor),
 ) -> WsEnvelope:
     if not body.confirm:
-        raise HTTPException(status_code=400, detail="confirm must be true")
+        raise HTTPException(status_code=400, detail="confirm_required")
     if not _restart_cooldown.allow():
-        raise HTTPException(status_code=429, detail="cooldown active")
+        raise HTTPException(status_code=429, detail="rate_limited")
     ok = supervisor.services_restart(name)
     return WsEnvelope(
         type="COMMAND_ACK",
         timestamp_ms=now_ms(),
-        data={"command": "service_restart", "name": name, "ok": ok},
+        data={"command": "service_restart", "name": name, "ok": ok, "reason": None},
     )

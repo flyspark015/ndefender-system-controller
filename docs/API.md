@@ -45,7 +45,7 @@ python3 tools/dev_client.py ws --base-url http://127.0.0.1:8000
 
 ## WebSocket
 Endpoint:
-- `WS /ws`
+- `WS /api/v1/ws`
 
 Envelope:
 ```json
@@ -67,14 +67,13 @@ Allowed types:
 - `COMMAND_ACK`
 
 ## Failure Modes
-- `400` when confirmation payload is missing
-- `401` invalid API key
-- `403` unsafe operations disabled
-- `429` cooldown active
-- `5xx` when underlying system commands fail
+- `400` `{"detail":"confirm_required"}`
+- `403` `{"detail":"unsafe_disabled"}`
+- `429` `{"detail":"rate_limited"}`
+- `5xx` `{"detail":"internal_error"}`
 
 ## Safety Notes
-- All risky operations require `{ "confirm": true }`.
+- All risky operations require `{ "payload": {}, "confirm": true }`.
 - Reboot/shutdown are disabled unless `NDEFENDER_ALLOW_UNSAFE=true`.
 
 ## Troubleshooting
@@ -91,5 +90,5 @@ Allowed types:
 - Polling intervals are configurable (see `README.md`).
 
 ## Security Notes
-- API key is optional for LAN usage.
+- No auth required in current deployment.
 - Sensitive operations are guarded with confirm + cooldown.
