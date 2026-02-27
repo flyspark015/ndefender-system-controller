@@ -1,3 +1,4 @@
+import re
 import socket
 import subprocess
 import shutil
@@ -48,27 +49,39 @@ class NetworkManager:
         except Exception:
             pass
         try:
-            lines = subprocess.run(
-                ["nmcli", "-t", "-f", "ACTIVE,SSID,BSSID,SIGNAL", "dev", "wifi"],
+            output = subprocess.run(
+                ["nmcli", "-m", "multiline", "-f", "ACTIVE,SSID,BSSID,SIGNAL", "dev", "wifi"],
                 capture_output=True,
                 text=True,
                 check=False,
                 timeout=2,
-            ).stdout.strip().splitlines()
-            for line in lines:
-                parts = line.split(":")
-                if len(parts) < 4:
+            ).stdout
+            current: dict[str, str] = {}
+            for line in output.splitlines():
+                if not line.strip():
+                    if current.get("active") == "yes":
+                        connected = True
+                        ssid = current.get("ssid") or None
+                        bssid = current.get("bssid") or None
+                        signal = current.get("signal")
+                        try:
+                            rssi_dbm = int(signal) - 100 if signal and signal.isdigit() else None
+                        except Exception:
+                            rssi_dbm = None
+                        break
+                    current = {}
                     continue
-                active = parts[0] == "yes"
-                if active:
-                    connected = True
-                    ssid = parts[1] or None
-                    bssid = parts[2] or None
-                    try:
-                        rssi_dbm = int(parts[3]) - 100
-                    except Exception:
-                        rssi_dbm = None
-                    break
+                key, value = (line.split(":", 1) + [""])[:2]
+                current[key.strip().lower()] = value.strip()
+            if not connected and current.get("active") == "yes":
+                connected = True
+                ssid = current.get("ssid") or None
+                bssid = current.get("bssid") or None
+                signal = current.get("signal")
+                try:
+                    rssi_dbm = int(signal) - 100 if signal and signal.isdigit() else None
+                except Exception:
+                    rssi_dbm = None
         except Exception:
             pass
         ip_v4, _ = self._read_ips()
@@ -238,16 +251,52 @@ class NetworkManager:
     def _read_ips() -> tuple[str | None, str | None]:
         ip_v4 = None
         ip_v6 = None
+
+        def is_valid_ipv4(candidate: str) -> bool:
+            return not (candidate.startswith("127.") or candidate.startswith("169.254."))
+
+        try:
+            output = subprocess.run(
+                ["ip", "-4", "route", "get", "1.1.1.1"],
+                capture_output=True,
+                text=True,
+                check=False,
+                timeout=2,
+            ).stdout
+            match = re.search(r"\bsrc\s+(\S+)", output)
+            if match:
+                candidate = match.group(1).strip()
+                if is_valid_ipv4(candidate):
+                    ip_v4 = candidate
+        except Exception:
+            pass
+
+        if not ip_v4:
+            try:
+                output = subprocess.run(
+                    ["hostname", "-I"],
+                    capture_output=True,
+                    text=True,
+                    check=False,
+                    timeout=2,
+                ).stdout
+                for token in output.split():
+                    if is_valid_ipv4(token):
+                        ip_v4 = token
+                        break
+            except Exception:
+                pass
+
         try:
             hostname = socket.gethostname()
             for info in socket.getaddrinfo(hostname, None):
                 family, _, _, _, sockaddr = info
-                if family == socket.AF_INET and ip_v4 is None:
+                if family == socket.AF_INET and ip_v4 is None and is_valid_ipv4(sockaddr[0]):
                     ip_v4 = sockaddr[0]
                 if family == socket.AF_INET6 and ip_v6 is None:
                     ip_v6 = sockaddr[0]
         except Exception:
-            return None, None
+            return ip_v4, ip_v6
         return ip_v4, ip_v6
 
     @staticmethod
